@@ -1,0 +1,43 @@
+module pipeline_processor (
+    input clk,
+    input reset
+);
+
+reg [7:0] instr_mem [0:7];
+reg [7:0] regfile [0:7];
+
+// Pipeline registers
+reg [7:0] IF_ID, ID_EX;
+reg [7:0] EX_WB;
+
+integer i;
+
+// Instruction Fetch
+always @(posedge clk) begin
+    if (reset)
+        IF_ID <= 0;
+    else
+        IF_ID <= instr_mem[0];
+end
+
+// Instruction Decode
+always @(posedge clk) begin
+    ID_EX <= IF_ID;
+end
+
+// Execute
+always @(posedge clk) begin
+    case (ID_EX[7:6])
+    2'b00: EX_WB <= regfile[ID_EX[5:3]] + regfile[ID_EX[2:0]]; // ADD
+    2'b01: EX_WB <= regfile[ID_EX[5:3]] - regfile[ID_EX[2:0]]; // SUB
+    2'b10: EX_WB <= regfile[ID_EX[5:3]];                      // LOAD
+    default: EX_WB <= 0;
+    endcase
+end
+
+// Write Back
+always @(posedge clk) begin
+    regfile[0] <= EX_WB;
+end
+
+endmodule
