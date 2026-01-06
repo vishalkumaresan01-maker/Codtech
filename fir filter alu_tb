@@ -1,0 +1,25 @@
+module FIR_tb;
+
+reg clk, reset;
+reg signed [7:0] x;
+wire signed [15:0] y;
+
+FIR_Filter uut (.clk(clk), .reset(reset), .x(x), .y(y));
+
+always #5 clk = ~clk;
+
+initial begin
+    clk = 0;
+    reset = 1;
+    x = 0;
+    #10 reset = 0;
+
+    x = 8'd1; #10;
+    x = 8'd2; #10;
+    x = 8'd3; #10;
+    x = 8'd4; #10;
+
+    $stop;
+end
+
+endmodule
